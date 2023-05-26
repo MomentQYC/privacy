@@ -10,6 +10,7 @@ type QueryResponse struct {
 	PhoneNumbers []string `json:"phone_numbers"`
 	IDNumbers    []string `json:"id_numbers"`
 	QQNumbers    []string `json:"qq_numbers"`
+	WBNumbers    []string `json:"wb_uids"`
 	Passwords    []string `json:"passwords"`
 	Emails       []string `json:"emails"`
 	Addresses    []string `json:"addresses"`
@@ -22,6 +23,7 @@ func NewQueryResponse() *QueryResponse {
 		PhoneNumbers: make([]string, 0),
 		IDNumbers:    make([]string, 0),
 		QQNumbers:    make([]string, 0),
+		WBNumbers:    make([]string, 0),
 		Passwords:    make([]string, 0),
 		Emails:       make([]string, 0),
 		Addresses:    make([]string, 0),
@@ -41,6 +43,8 @@ func (svc *Service) queryHandlerFunc(ctx echo.Context) error {
 			result.addQQNumber(int64(value))
 		case PhoneNumber:
 			result.addPhoneNumber(int64(value))
+		case WBNumber:
+			result.addWBNumber(int64(value))
 		case Email:
 			result.addEmail(string(value))
 		case IDNumber:
@@ -68,6 +72,14 @@ func (svc *Service) queryHandlerFunc(ctx echo.Context) error {
 		for idNumber, checked := range result.IDNumbers {
 			if !checked {
 				if err := result.queryIDNumber(svc.databases, string(idNumber)); err != nil {
+					return err
+				}
+			}
+			continue
+		}
+		for wbNumber, checked := range result.WBNumbers {
+			if !checked {
+				if err := result.queryWBNumber(svc.databases, int64(wbNumber)); err != nil {
 					return err
 				}
 			}
