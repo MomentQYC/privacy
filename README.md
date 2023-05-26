@@ -1,8 +1,8 @@
 # Privacy
 
-![GitHub last commit](https://img.shields.io/github/last-commit/MomentQYC/privacy?style=flat-square)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/MomentQYC/privacy?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/MomentQYC/privacy?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/kallydev/privacy?style=flat-square)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/kallydev/privacy?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/kallydev/privacy?style=flat-square)
 
 个人数据泄漏检测网站，适用于近期流传的 40GB+ 数据。  
 有人去进行所谓的警告前不妨考虑考虑怎么在个人信息安全这方面向用户交代，应该怎么应付索赔。
