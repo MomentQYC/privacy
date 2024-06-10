@@ -119,9 +119,9 @@ function App() {
                         <TextField
                             fullWidth
                             id="filled-basic"
-                            label="QQ / 微博UID / 手机号 / 身份证号 / 邮箱"
+                            label="QQ / @微博UID / +手机号 / 身份证号 / 邮箱"
                             variant="outlined"
-                            type="number"
+                            type="text"
                             onChange={event => {
                                 setValue(event.target.value)
                             }}

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/labstack/echo/v4"
+	"strconv"
 )
 
 type QueryResponse struct {
@@ -35,65 +36,50 @@ func (svc *Service) queryHandlerFunc(ctx echo.Context) error {
 	if value == "" {
 		return InvalidParameterError
 	}
+
 	result := NewQueryResult()
-	types := whatType(value)
-	for _, t := range types {
-		switch value := t.(type) {
-		case QQNumber:
-			result.addQQNumber(int64(value))
-		case PhoneNumber:
-			result.addPhoneNumber(int64(value))
-		case WBNumber:
-			result.addWBNumber(int64(value))
-		case Email:
-			result.addEmail(string(value))
-		case IDNumber:
-			result.addIDNumber(string(value))
+
+	if value[0] == '@' {
+		trimmedValue := value[1:]
+		wbNumber, err := strconv.ParseInt(trimmedValue, 10, 64)
+		if err != nil {
+			return err
 		}
-	}
-	ok := false
-	for !ok {
-		for qqNumber, checked := range result.QQNumbers {
-			if !checked {
-				if err := result.queryQQNumber(svc.databases, int64(qqNumber)); err != nil {
-					return err
-				}
-			}
-			continue
+		if err := result.queryWBNumber(svc.databases, wbNumber); err != nil {
+			return err
 		}
-		for phoneNumber, checked := range result.PhoneNumbers {
-			if !checked {
+
+		for phoneNumber := range result.PhoneNumbers {
+			if !result.PhoneNumbers[phoneNumber] {
 				if err := result.queryPhoneNumber(svc.databases, int64(phoneNumber)); err != nil {
 					return err
 				}
 			}
-			continue
 		}
-		for idNumber, checked := range result.IDNumbers {
-			if !checked {
-				if err := result.queryIDNumber(svc.databases, string(idNumber)); err != nil {
-					return err
-				}
+	} else if value[0] == '+' {
+		trimmedValue := value[1:]
+		phoneNumber, err := strconv.ParseInt(trimmedValue, 10, 64)
+		if err != nil {
+			return err
+		}
+		if err := result.queryPhoneNumber(svc.databases, phoneNumber); err != nil {
+			return err
+		}
+	} else {
+		types := whatType(value)
+		for _, t := range types {
+			switch value := t.(type) {
+			case QQNumber:
+				result.addQQNumber(int64(value))
+			case Email:
+				result.addEmail(string(value))
+			case IDNumber:
+				result.addIDNumber(string(value))
 			}
-			continue
 		}
-		for wbNumber, checked := range result.WBNumbers {
-			if !checked {
-				if err := result.queryWBNumber(svc.databases, int64(wbNumber)); err != nil {
-					return err
-				}
-			}
-			continue
-		}
-		for email, checked := range result.Emails {
-			if !checked {
-				if err := result.queryEmail(svc.databases, string(email)); err != nil {
-					return err
-				}
-			}
-			continue
-		}
-		ok = true
 	}
-	return NewResponse(ctx, nil, result.Build(svc.config.Mask))
+
+	response := result.Build(svc.config.Mask)
+	return NewResponse(ctx, nil, response)
 }
+
